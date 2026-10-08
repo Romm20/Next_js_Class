@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { redirect } from "next/navigation";
+import LogoutButton from "../../app/components/LogoutButton";
 
 const secret = new TextEncoder().encode(
   process.env.AUTH_SECRET
@@ -27,21 +28,7 @@ export default async function UserPage() {
     redirect("/login");
   }
 
-  async function logout() {
-    "use server";
-
-    const cookieStore = await cookies();
-
-    cookieStore.set("auth_token", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 0,
-    });
-
-    redirect("/login");
-  }
+  
 
   return (
     <main className="user-page">
@@ -49,11 +36,7 @@ export default async function UserPage() {
 
       <p>Bienvenue {userName} dans votre espace utilisateur.</p>
 
-      <form action={logout}>
-        <button type="submit" className="logout-button">
-          Se déconnecter
-        </button>
-      </form>
+      <LogoutButton />
     </main>
   );
 }
