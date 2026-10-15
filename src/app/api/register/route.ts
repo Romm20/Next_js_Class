@@ -5,18 +5,10 @@ import { registerSchema } from "@/lib/validation";
 
 export async function POST(request: Request) {
   try {
-    // =========================
     // RECUPERER LES DONNEES
-    // =========================
-
     const body = await request.json();
-
-    // =========================
     // VALIDATION ZOD
-    // =========================
-
     const result = registerSchema.safeParse(body);
-
     if (!result.success) {
       return NextResponse.json(
         {
@@ -27,18 +19,13 @@ export async function POST(request: Request) {
         }
       );
     }
-
     // Données validées et nettoyées par Zod
     const {
       name,
       email,
       password,
     } = result.data;
-
-    // =========================
     // VERIFIER SI L'EMAIL EXISTE
-    // =========================
-
     const existingUser =
       await prisma.user.findUnique({
         where: {
@@ -56,35 +43,22 @@ export async function POST(request: Request) {
         }
       );
     }
-
-    // =========================
     // HASH DU MOT DE PASSE
-    // =========================
-
     const hashedPassword =
       await bcrypt.hash(password, 10);
-
-    // =========================
     // CREER L'UTILISATEUR
-    // =========================
-
     const user =
       await prisma.user.create({
         data: {
           name: name,
           email: email,
           password: hashedPassword,
-
           // Un compte créé par Register
           // est toujours USER
           role: "USER",
         },
       });
-
-    // =========================
     // REPONSE
-    // =========================
-
     return NextResponse.json(
       {
         message: "Compte créé avec succès",
@@ -100,7 +74,6 @@ export async function POST(request: Request) {
         status: 201,
       }
     );
-
   } catch (error) {
     console.error(
       "REGISTER ERROR:",

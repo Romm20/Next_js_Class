@@ -4,32 +4,26 @@ import bcrypt from "bcryptjs";
 import { SignJWT } from "jose";
 import { loginSchema } from "@/lib/validation";
 
-// =========================
+
 // SECRET
-// =========================
 
 const secret = new TextEncoder().encode(
   process.env.AUTH_SECRET
 );
 
-// =========================
+
 // LOGIN
-// =========================
+
 
 export async function POST(
   request: Request
 ) {
   try {
-    // =========================
     // RECUPERER LES DONNEES
-    // =========================
-
     const body = await request.json();
-
-    // =========================
+   
     // VALIDATION ZOD
-    // =========================
-
+    
     const result = loginSchema.safeParse(body);
 
     if (!result.success) {
@@ -42,28 +36,19 @@ export async function POST(
         }
       );
     }
-
     // Données validées et normalisées par Zod
     const {
       email,
       password,
     } = result.data;
-
-    // =========================
     // RECHERCHE UTILISATEUR
-    // =========================
-
     const user =
       await prisma.user.findUnique({
         where: {
           email: email,
         },
       });
-
-    // =========================
     // UTILISATEUR NON TROUVE
-    // =========================
-
     if (!user) {
       return NextResponse.json(
         {
@@ -75,11 +60,7 @@ export async function POST(
         }
       );
     }
-
-    // =========================
     // VERIFIER LE MOT DE PASSE
-    // =========================
-
     const passwordCorrect =
       await bcrypt.compare(
         password,
@@ -97,10 +78,7 @@ export async function POST(
         }
       );
     }
-
-    // =========================
     // CREER LE JWT
-    // =========================
 
     const token =
       await new SignJWT({
@@ -158,10 +136,7 @@ export async function POST(
     return response;
 
   } catch (error) {
-    // =========================
     // ERREUR SERVEUR
-    // =========================
-
     console.error(
       "LOGIN ERROR:",
       error
